@@ -1,0 +1,33 @@
+#!/bin/sh
+# Spouštěcí skript balíčku; DSM ho volá s argumentem start|stop|status.
+
+# DSM spouští skript z /var/packages/<balíček>/scripts/
+PKG=$(basename "$(dirname "$(dirname "$(readlink -f "$0")")")")
+BIN="/var/packages/${PKG}/target/bin/${PKG}"
+PIDFILE="/var/packages/${PKG}/var/${PKG}.pid"
+LOGFILE="/var/packages/${PKG}/var/${PKG}.log"
+
+is_running() {
+	[ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null
+}
+
+case "$1" in
+	start)
+		is_running && exit 0
+		nohup "$BIN" >>"$LOGFILE" 2>&1 &
+		echo $! >"$PIDFILE"
+		;;
+	stop)
+		if is_running; then
+			kill "$(cat "$PIDFILE")"
+		fi
+		rm -f "$PIDFILE"
+		;;
+	status)
+		is_running
+		;;
+	*)
+		exit 1
+		;;
+esac
+exit 0

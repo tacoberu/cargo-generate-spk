@@ -1,0 +1,23 @@
+[package]
+name = "synodemo"
+version = "0.1.0"
+edition = "2024"
+description = "Testovací HTTP server v Rustu, naslouchá na portu 8085."
+authors = ["Martin Takáč"]
+
+[dependencies]
+
+[profile.release]
+strip = true
+lto = true
+
+[package.metadata.generate-spk]
+displayname = "Synodemo"
+arch = ["rtd1296"]
+os_min_ver = "7.1-42962"
+startable = true
+scripts = "spk/scripts"
+conf = "spk/conf"
+assets = [
+    { source = "target/release/synodemo", dest = "bin/synodemo", mode = "0755" },
+]
